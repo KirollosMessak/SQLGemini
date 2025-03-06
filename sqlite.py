@@ -1,21 +1,37 @@
 import sqlite3
-#connect to sqlite database
+
+# Connect to SQLite database (creates 'student.db' if it doesn't exist)
 connection = sqlite3.connect('student.db')
 cursor = connection.cursor() 
-# a cursor is an object used to interact with the database. It allows you to execute SQL queries and retrieve results
 
-table_info=""" 
-CREATE table student (NAME VARCHAR (25), CLASS VARCHAR (25), 
-SECTION VARCHAR (25)) 
+# Create table if it does not exist
+table_info = """ 
+CREATE TABLE IF NOT EXISTS student (
+    NAME VARCHAR(25), 
+    CLASS VARCHAR(25), 
+    SECTION VARCHAR(25)
+) 
 """
 cursor.execute(table_info)
 
-cursor.execute(''' Insert Into Student values ('karim' , 'AI', 'A')''')
-cursor.execute(''' Insert Into Student values ('emad' , 'ML', 'A')''')
-cursor.execute(''' Insert Into Student values ('Alback' , 'DL', 'C')''')
-cursor.execute(''' Insert Into Student values ('Mesho' , 'GEnai', 'B')''')
+# Insert data into the table
+students = [
+    ('Karim', 'AI', 'A'),
+    ('Emad', 'ML', 'A'),
+    ('Alback', 'DL', 'C'),
+    ('Mesho', 'GenAI', 'B')  # Fixed spelling: "GEnai" → "GenAI"
+]
 
-print('the data inserted is')
-data= cursor.execute(''' SELECT * FROM student''')
+cursor.executemany("INSERT INTO student VALUES (?, ?, ?)", students)
+
+# Commit the changes
+connection.commit()
+
+# Retrieve and display the data
+print("The data inserted is:")
+data = cursor.execute("SELECT * FROM student")
 for row in data:
-    print (row)
+    print(row)
+
+# Close the connection
+connection.close()
